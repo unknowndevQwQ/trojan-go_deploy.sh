@@ -5,42 +5,51 @@ export LANG=en_US
 export LANGUAGE=en_US.UTF-8
 apt -y update
 apt -y upgrade
-apt-get install wget curl socat jq unzip nginx
+apt install -y wget curl socat jq unzip nginx
 #读取域名
-read -p "please enter your domain:" domain
+read -p "Please enter your domain: " domain
 
 #获取最新版triojan-go
-echo "get latest version of trojan-go"
+echo "Fetching latest version of Trojan-Go"
 latest_version="$(curl -s "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq '.[0].tag_name' --raw-output)"
 wget https://github.com/p4gefau1t/trojan-go/releases/download/${latest_version}/trojan-go-linux-amd64.zip
 unzip trojan-go-linux-amd64.zip
 rm -f trojan-go-linux-amd64.zip
-mv trojan-go /usr/local/bin/trojan-go &&chmod +x /usr/local/bin/trojan-go
-mv geoip.dat /usr/share/geoip.dat
-mv geosite.dat /usr/share/geosite.dat
-mkdir  /etc/trojan-go&&chmod 755 /etc/trojan-go
+
+mv ./trojan-go /usr/local/bin/trojan-go &&chmod +x /usr/local/bin/trojan-go
+mv ./geoip.dat /usr/share/geoip.dat
+mv ./geosite.dat /usr/share/geosite.dat
+
+mkdir /etc/trojan-go && chmod 755 /etc/trojan-go
+
 #安装acme.sh
-echo "install acme.sh"
+echo "Installing acme.sh"
 curl  https://get.acme.sh | sh
+
 #签发及安装证书
-echo "issue the certification"
+echo "Issuing certificate"
 ~/.acme.sh/acme.sh --issue -d "$domain" -w /var/www/html --keylength ec-256
-echo "now install certification"
+
+echo "Installing certificate"
 mkdir /etc/trojan-go/ssl&&chmod +x /etc/trojan-go/ssl
+
 ~/.acme.sh/acme.sh --install-cert --ecc --force -d "$domain" \
---key-file       /etc/trojan-go/ssl/key.pem \
---fullchain-file /etc/trojan-go/ssl/fullchain-cert.pem \
---reloadcmd     "systemctl restart trojan-go.service"
+    --key-file       /etc/trojan-go/ssl/key.pem              \
+    --fullchain-file /etc/trojan-go/ssl/fullchain-cert.pem   \
+    --reloadcmd      "systemctl restart trojan-go.service"
+
 chmod 644 /etc/trojan-go/ssl/key.pem 
 chmod 644 /etc/trojan-go/ssl/fullchain-cert.pem
+
 ~/.acme.sh/acme.sh  --upgrade  --auto-upgrade
 
 #建立伪装网站
-echo "deplopy dummy website anti probing"
+echo "Deploying dummy website for anti-probing"
 template="$(curl -s https://raw.githubusercontent.com/phlinhng/web-templates/master/list.txt | shuf -n  1)"
 wget -q https://raw.githubusercontent.com/phlinhng/web-templates/master/${template} -O /tmp/template.zip
 mkdir -p /var/www/html
 unzip -q /tmp/template.zip -d /var/www/html
+
 wget -q https://raw.githubusercontent.com/phlinhng/v2ray-tcp-tls-web/${branch}/custom/robots.txt -O /var/www/html/robots.txt 
 cat > "/var/wwww/html/400.html" <<-EOF
 <html>
@@ -48,7 +57,7 @@ cat > "/var/wwww/html/400.html" <<-EOF
 <body>an http request has been send to https port</body>
 </html>
 EOF
-systemctl stop nginx
+
 cat > "/etc/nginx/sites-enabled/dummyweb.conf" <<-EOF
 server {
     listen 127.0.0.1:888;
@@ -58,11 +67,13 @@ server {
     error_page 400 400.html；
 }
 EOF
-systemctl start nginx
+
+systemctl restart nginx
 
 #设置trojan-go.service
 groupadd trojan-go
 useradd -g trojan-go -s /usr/sbin/nologin trojan-go
+
 cat > "/etc/systemd/system/trojan-go.service" <<-EOF
 [Unit]
 Description=Trojan-Go - An unidentifiable mechanism that helps you bypass GFW
@@ -81,12 +92,13 @@ RestartSec=10s
 [Install]
 WantedBy=multi-user.target
 EOF
+
 systemctl enable trojan-go 
 systemctl daemon-reload
 
 #部署trojan-go
 password="$(openssl rand -hex 12)"
-read -p "do you want to enable websocket?(y/n)" yn
+read -p "Do you want to enable websocket? [y/n]" yn
 if ["$yn"="Y"] || ["$yn"="y"];then
 ws_path="$(openssl rand -hex 6)"
 cat > "/etc/trojan-go/config.yaml" <<-EOF
@@ -114,6 +126,7 @@ websocket:
   host: $domain
 EOF
 fi
+
 if ["$yn"="N"] || ["$yn"="n"];then
 cat > "/etc/trojan-go/config.yaml" <<-EOF
 run-type: server
@@ -136,9 +149,10 @@ router:
   geosite: /usr/share/geosite.dat
 EOF
 fi
+
 chmod 644 /etc/trojan-go/config.yaml
 systemctl start trojan-go
-echo "trojan-go has been deployed in your server"
+echo "Trojan-Go has been deployed in your server"
 
 #开启bbr
 echo "enable bbr now"
