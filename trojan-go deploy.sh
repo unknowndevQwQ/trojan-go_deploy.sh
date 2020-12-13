@@ -71,8 +71,7 @@ EOF
 systemctl restart nginx
 
 #设置trojan-go.service
-groupadd trojan-go
-useradd -g trojan-go -s /usr/sbin/nologin trojan-go
+useradd --inactive 0 --no-create-home --uid 211 --user-group --shell /usr/bin/nologin --system trojan-go
 
 cat > "/etc/systemd/system/trojan-go.service" <<-EOF
 [Unit]
