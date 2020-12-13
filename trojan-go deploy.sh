@@ -15,8 +15,8 @@ unzip trojan-go-linux-amd64.zip
 rm -f trojan-go-linux-amd64.zip
 
 mv ./trojan-go /usr/local/bin/trojan-go &&chmod +x /usr/local/bin/trojan-go
-mv ./geoip.dat /usr/share/geoip.dat
-mv ./geosite.dat /usr/share/geosite.dat
+mv ./geoip.dat /usr/share/trojan-go/geoip.dat
+mv ./geosite.dat /usr/share/trojan-go/geosite.dat
 
 mkdir /etc/trojan-go && chmod 755 /etc/trojan-go
 
@@ -115,8 +115,8 @@ router:
   enabled: true
   block:
     - 'geoip:private'
-  geoip: /usr/share/geoip.dat
-  geosite: /usr/share/geosite.dat
+  geoip: /usr/share/trojan-go/geoip.dat
+  geosite: /usr/share/trojan-go/geosite.dat
 websocket:
   enabled: true
   path: $ws_path
@@ -142,8 +142,8 @@ router:
   enabled: true
   block:
     - 'geoip:private'
-  geoip: /usr/share/geoip.dat
-  geosite: /usr/share/geosite.dat
+  geoip: /usr/share/trojan-go/geoip.dat
+  geosite: /usr/share/trojan-go/geosite.dat
 EOF
 fi
 
