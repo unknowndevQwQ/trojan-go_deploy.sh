@@ -5,14 +5,14 @@ export LC_ALL=C
 #export LANGUAGE=en_US.UTF-8
 apt -y update
 apt -y upgrade
-apt install -y wget curl socat jq unzip nginx
+apt install -y curl socat jq unzip nginx
 #读取域名
 read -p "Please enter your domain: " domain
 
 #获取最新版triojan-go
 echo "Fetching latest version of Trojan-Go"
 latest_version="$(curl -s "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq '.[0].tag_name' --raw-output)"
-wget https://github.com/p4gefau1t/trojan-go/releases/download/${latest_version}/trojan-go-linux-amd64.zip
+curl -GLO https://github.com/p4gefau1t/trojan-go/releases/download/${latest_version}/trojan-go-linux-amd64.zip
 unzip trojan-go-linux-amd64.zip
 rm -f trojan-go-linux-amd64.zip
 
@@ -46,11 +46,11 @@ chmod 644 /etc/trojan-go/ssl/fullchain-cert.pem
 #建立伪装网站
 echo "Deploying dummy website for anti-probing"
 template="$(curl -s https://raw.githubusercontent.com/phlinhng/web-templates/master/list.txt | shuf -n  1)"
-wget -q https://raw.githubusercontent.com/phlinhng/web-templates/master/${template} -O /tmp/template.zip
+curl https://raw.githubusercontent.com/phlinhng/web-templates/master/${template} -o /tmp/template.zip
 mkdir -p /var/www/html
 unzip -q /tmp/template.zip -d /var/www/html
 
-wget -q https://raw.githubusercontent.com/phlinhng/v2ray-tcp-tls-web/${branch}/custom/robots.txt -O /var/www/html/robots.txt 
+curl https://raw.githubusercontent.com/phlinhng/v2ray-tcp-tls-web/${branch}/custom/robots.txt -o /var/www/html/robots.txt 
 cat > "/var/wwww/html/400.html" <<-EOF
 <html>
 <head></head>
