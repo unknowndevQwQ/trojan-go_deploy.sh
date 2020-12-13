@@ -152,9 +152,14 @@ systemctl start trojan-go
 echo "Trojan-Go has been deployed in your server"
 
 #开启bbr
-echo "enable bbr now"
-echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
-echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+if sysctl net.ipv4.tcp_available_congestion_control | grep bbr &>/dev/null; then
+    echo "enable bbr now"
+    # curl https://raw.githubusercontent.com/unknowndev233/my_etc-/master/Arch/etc/sysctl.d/60-enable-tcp_bbr.conf -o /etc/sysctl.d/60-enable-tcp_bbr.conf
+    echo "net.core.default_qdisc=cake" >> /etc/sysctl.d/60-enable-tcp_bbr.conf
+    echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.d/60-enable-tcp_bbr.conf
+else
+    echo "Not support bbr" >&2
+fi
 
 #显示分享链接
 if ["$yn"="Y"] || ["$yn"="y"];then
