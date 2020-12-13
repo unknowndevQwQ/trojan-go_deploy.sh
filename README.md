@@ -1,4 +1,4 @@
-> trojan-go_deploy.sh
+# trojan-go_deploy.sh
 自己瞎糊的从别人那里偷了很多东西的，不知道能不能用的破烂半成品脚本
 * 适用环境
 
