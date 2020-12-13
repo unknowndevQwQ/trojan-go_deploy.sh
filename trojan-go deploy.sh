@@ -3,13 +3,11 @@
 export LC_ALL=C
 #export LANG=en_US
 #export LANGUAGE=en_US.UTF-8
-apt -y update
-apt -y upgrade
-apt install -y curl socat jq unzip nginx
+apt -y update && apt -y upgrade && apt install -y curl socat jq unzip nginx
 #读取域名
 read -p "Please enter your domain: " domain
 
-#获取最新版triojan-go
+#获取最新版trojan-go
 echo "Fetching latest version of Trojan-Go"
 latest_version="$(curl -s "https://api.github.com/repos/p4gefau1t/trojan-go/releases" | jq '.[0].tag_name' --raw-output)"
 curl -GLO https://github.com/p4gefau1t/trojan-go/releases/download/${latest_version}/trojan-go-linux-amd64.zip
