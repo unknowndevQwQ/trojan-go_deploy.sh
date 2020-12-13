@@ -1,8 +1,8 @@
 #!/bin/bash
 #网页模版由 https://github.com/phlinhng 大神整理。其他细节也多有参考其脚本 https://github.com/phlinhng/v2ray-tcp-tls-web/blob/vless/src/v2gun.sh
 export LC_ALL=C
-export LANG=en_US
-export LANGUAGE=en_US.UTF-8
+#export LANG=en_US
+#export LANGUAGE=en_US.UTF-8
 apt -y update
 apt -y upgrade
 apt install -y wget curl socat jq unzip nginx
